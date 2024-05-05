@@ -2,17 +2,12 @@
 import * as React from 'react';
 import { View, Text } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import HomeScreen from './App2';
-
-const Stack = createNativeStackNavigator();
-
+import RootStack from './src/navigator/app';
+import { navigationRef } from './src/navigator/RootNavigation';
 function App() {
   return (
-    <NavigationContainer>
-      <Stack.Navigator>
-        <Stack.Screen name="Home" component={HomeScreen} />
-      </Stack.Navigator>
+    <NavigationContainer ref={navigationRef}>
+    <RootStack></RootStack>
     </NavigationContainer>
   );
 }
