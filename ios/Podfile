@@ -3,10 +3,12 @@ require_relative '../node_modules/@react-native-community/cli-platform-ios/nativ
 
 platform :ios, '12.4'
 install! 'cocoapods', :deterministic_uuids => false
+$RNMapboxMapsImpl = 'mapbox'
+$RNMapboxMapsVersion = '~> 10.11.1'
 
 target 'sync_store' do
   config = use_native_modules!
-
+  use_modular_headers!
   # Flags change depending on the env values.
   flags = get_default_flags()
 
@@ -21,7 +23,7 @@ target 'sync_store' do
     #
     # Note that if you have use_frameworks! enabled, Flipper will not work and
     # you should disable the next line.
-    :flipper_configuration => FlipperConfiguration.enabled,
+    # :flipper_configuration => FlipperConfiguration.enabled,
     # An absolute path to your application root.
     :app_path => "#{Pod::Config.instance.installation_root}/.."
   )
@@ -31,7 +33,12 @@ target 'sync_store' do
     # Pods for testing
   end
 
+  pre_install do |installer|
+    $RNMapboxMaps.pre_install(installer)
+  end
+
   post_install do |installer|
+    $RNMapboxMaps.post_install(installer)
     react_native_post_install(
       installer,
       # Set `mac_catalyst_enabled` to `true` in order to apply patches

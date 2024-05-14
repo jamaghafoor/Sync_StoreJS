@@ -1,4 +1,4 @@
-package com.sync_store.newarchitecture;
+package com.trofibooking.app.newarchitecture;
 
 import android.app.Application;
 import androidx.annotation.NonNull;
@@ -19,9 +19,9 @@ import com.facebook.react.fabric.CoreComponentsRegistry;
 import com.facebook.react.fabric.FabricJSIModuleProvider;
 import com.facebook.react.fabric.ReactNativeConfig;
 import com.facebook.react.uimanager.ViewManagerRegistry;
-import com.sync_store.BuildConfig;
-import com.sync_store.newarchitecture.components.MainComponentsRegistry;
-import com.sync_store.newarchitecture.modules.MainApplicationTurboModuleManagerDelegate;
+import com.trofibooking.app.BuildConfig;
+import com.trofibooking.app.newarchitecture.components.MainComponentsRegistry;
+import com.trofibooking.app.newarchitecture.modules.MainApplicationTurboModuleManagerDelegate;
 import java.util.ArrayList;
 import java.util.List;
 

@@ -1,4 +1,4 @@
-package com.sync_store;
+package com.trofibooking.app;
 
 import com.facebook.react.ReactActivity;
 import com.facebook.react.ReactActivityDelegate;
