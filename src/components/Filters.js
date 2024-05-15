@@ -114,6 +114,7 @@ const Filters = ({navigation}) => {
                 setSliderValue(value);
                 handleShowResult();
               }}
+              step={0.5}
               minimumValue={0}
               maximumValue={10}
               minimumTrackTintColor="#e67e45"
@@ -136,7 +137,7 @@ const Filters = ({navigation}) => {
                 paddingTop: 10,
               }}>
               <Text style={{fontSize: 12.5, color: "#6f7574"}}>Near Me</Text>
-              <Text style={{fontSize: 12.5, color: "#6f7574"}}>0 - 4 KM</Text>
+              <Text style={{fontSize: 12.5, color: "#6f7574"}}>{sliderValue} KM</Text>
               <Text style={{fontSize: 12.5, color: "#6f7574"}}>10 KM</Text>
             </View>
           </View>
