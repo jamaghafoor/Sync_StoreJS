@@ -2,10 +2,12 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key></key>
+	<string></string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleDisplayName</key>
-	<string>sync_store</string>
+	<string>Trofi</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -20,10 +22,24 @@
 	<string>1.0</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>com.googleusercontent.apps.259932369552-gmk2ae7f4pvkvccr5o9j4g0i1lhi51nh</string>
+				<string>fb725605769779800</string>
+			</array>
+		</dict>
+	</array>
 	<key>CFBundleVersion</key>
 	<string>1</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>MBXAccessToken</key>
+	<string>pk.eyJ1Ijoic2FtZWVydWxsYXMiLCJhIjoiY2x2dnZhc3N4MjE0ZTJzbWc1bmphd2V6bSJ9.B9DZK9MyxJuvERdkguu5Uw</string>
 	<key>NSAppTransportSecurity</key>
 	<dict>
 		<key>NSExceptionDomains</key>
@@ -51,5 +67,11 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
+	<key>FacebookAppID</key>
+	<string>725605769779800</string>
+	<key>FacebookClientToken</key>
+	<string>30494667847a1e59fc6fd40be72a5a4b</string>
+	<key>FacebookDisplayName</key>
+	<string>Trofi</string>
 </dict>
 </plist>

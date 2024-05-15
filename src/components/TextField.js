@@ -30,6 +30,7 @@ import {
     textFieldRef,
     icon_name,
     CustomeIcon,
+    backgroundColor,
     placeholderTextColor,
     mainContainerStyle={},
     ...otherProps

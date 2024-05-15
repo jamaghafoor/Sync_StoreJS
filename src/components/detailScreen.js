@@ -16,9 +16,36 @@ import React, {useState} from 'react';
 import {heightPercentage, isIpad, widthPercentage} from '../utils';
 import Rating from './Rating';
 import Carousel from './Swipper';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const ProductDetails = ({navigation}) => {
+const ProductDetails = ({navigation, route}) => {
+  const product = route?.params?.item;
+  console.log(" product:", product)
   const [showMoreDetails, setShowMoreDteails] = useState(false);
+  const [itemLiked, setItemLiked] = useState(product?.like);
+
+  const likeUnlikeHandle = async (id, type) => {
+    setItemLiked(!itemLiked)
+    let allHotelsData = await AsyncStorage.getItem('HotelsData');
+    let allArr =  JSON.parse(allHotelsData)
+
+    if (type == 'unlike') {
+      allArr?.forEach(item => {
+        if (item?.id == id) {
+          item["like"] = false;
+        }
+      });
+    } else{
+      allArr?.forEach(item => {
+        if (item?.id == id) {
+          item["like"] = true;
+        }
+      });
+    }
+    await AsyncStorage.setItem('HotelsData', JSON.stringify(allArr));
+
+    
+  };
 
   return (
     <View style={{flex: 1}}>
@@ -32,11 +59,15 @@ const ProductDetails = ({navigation}) => {
         <Text style={[styles.headText, {textAlign: 'center'}]}>
           Hotel OverView
         </Text>
-        <TouchableOpacity>
-          <Image
+        <TouchableOpacity 
+        onPress={() => likeUnlikeHandle(product?.id, itemLiked ? "unlike" : "like")}>
+          {itemLiked ? <Image
+            source={require('../../assets/heart-checked.png')}
+            style={styles.heartLikeImg}
+          /> : <Image
             source={require('../../assets/heart-out.png')}
             style={styles.heartOutImg}
-          />
+          />}
         </TouchableOpacity>
       </View>
       <ScrollView style={{flex: 1, height: '100%'}}>
@@ -94,7 +125,7 @@ const ProductDetails = ({navigation}) => {
               }}>
               <Rating maxSize={true} />
               <Text style={{fontSize: 13, paddingLeft: 7, color: '#ced7d5'}}>
-                {'4.5'}
+                {product?.rating}
               </Text>
             </View>
             <Text style={{fontSize: 12}}></Text>
@@ -108,7 +139,7 @@ const ProductDetails = ({navigation}) => {
               paddingVertical: 5,
               letterSpacing: 1,
             }}>
-            Bougainvillea Hotel
+           {product?.name}
           </Text>
           <View
             style={{
@@ -124,7 +155,7 @@ const ProductDetails = ({navigation}) => {
               style={stateStyles.mapImg}
             />
             <Text style={{fontSize: 13, letterSpacing: 1}}>
-              429 N Bay Shore, Hawaii, USA
+             {product?.location}
             </Text>
           </View>
           <View
@@ -143,9 +174,9 @@ const ProductDetails = ({navigation}) => {
               width: '100%',
               paddingHorizontal: 15,
             }}>
-            <Text style={styles.tab}>3 Guests</Text>
-            <Text style={styles.tab}>1 Bedroom</Text>
-            <Text style={styles.tab}>1 Queen Bed</Text>
+           {product?.guests > 0 && <Text style={styles.tab}>{product?.guests} {product?.guests > 1 ? "Guests" : "Guest"}</Text>}
+            <Text style={styles.tab}>{product?.bedrooms} {product?.bedrooms > 1 ? "Bedrooms" : "Bedroom"}</Text>
+            <Text style={styles.tab}>{product?.bathrooms} {product?.bathrooms > 1 ? "Bathrooms" : "Bathroom"}</Text>
           </View>
           <View
             style={{
@@ -156,8 +187,7 @@ const ProductDetails = ({navigation}) => {
               paddingHorizontal: 15,
               marginTop: 15,
             }}>
-            <Text style={styles.tab}>1 Baby Bed</Text>
-            <Text style={styles.tab}>1 Bathroom</Text>
+           {product?.studio && <Text style={styles.tab}>Studio</Text>}
           </View>
         </View>
 
@@ -166,41 +196,25 @@ const ProductDetails = ({navigation}) => {
             LayoutAnimation.configureNext(LayoutAnimation.Presets.linear);
             setShowMoreDteails(!showMoreDetails);
           }}>
-          <View style={{paddingHorizontal: 15}}>
-            <Text style={{fontSize: 13, letterSpacing: 0.9}}>
-              Praesent pharetra nisi nec lectus consequat hotel gravid. Integer
-              non risus non nibh porttitor dignissim.
-            </Text>
             <View>
-              {showMoreDetails && (
-                <Text style={{fontSize: 13, letterSpacing: 0.9, marginTop: 10}}>
-                  Praesent pharetra nisi nec lectus consequat hotel gravid.
-                  Integer non risus non nibh porttitor dignissim.
-                </Text>
-              )}
-              {showMoreDetails && (
-                <Text style={{fontSize: 13, letterSpacing: 0.9, marginTop: 10}}>
-                  Etiam lacinia porta magna, id tempor justo elementum ut. Donec
-                  commodo ex sit amet consectetur pharetra. Cras ut tristique
-                  eros, ac cursus juston. Praesent pharetra nisi nec lectus
-                  consequat hotel gravid. Integer non risus non nibh porttitor
-                  dignissim. Etiam lacinia porta magna, id tempor justo
-                  elementum ut. Donec commodo ex sit amet consectetur pharetra.
-                  Cras ut tristique eros, ac cursus juston. Praesent pharetra
-                  nisi nec lectus consequat hotel gravid. Integer non risus non
-                  nibh porttitor dignissim.
-                </Text>
-              )}
-            </View>
+
+            
+          <View style={{paddingHorizontal: 15}}>
             {!showMoreDetails && (
               <Text style={{fontSize: 13, letterSpacing: 0.9, marginTop: 10}}>
-                Etiam lacinia porta magna, id tempor justo elementum ut. Donec
-                commodo ex sit amet consectetur pharetra. Cras ut tristique
-                eros, ac cursus justo…
+               {product?.descreption.slice(0,200)}
                 <Text style={styles.viewMore}>{' Read More'}</Text>
               </Text>
             )}
           </View>
+          <View style={{paddingHorizontal: 15}}>
+              {showMoreDetails && (
+                <Text style={{fontSize: 13, letterSpacing: 0.9,}}>
+                 {product?.descreption}
+                </Text>
+              )}
+            </View>
+            </View>
         </TouchableWithoutFeedback>
 
         <View
@@ -213,7 +227,7 @@ const ProductDetails = ({navigation}) => {
           }}>
           <View>
             <Text style={{color: '#439281', fontSize: 25, letterSpacing: 1}}>
-              $950{' '}
+              ${product?.rate}
               <Text
                 style={{
                   color: '#ced7d5',
@@ -221,7 +235,7 @@ const ProductDetails = ({navigation}) => {
                   fontSize: 14,
                   letterSpacing: 1,
                 }}>
-                /3 nights
+                /night
               </Text>
             </Text>
             <Text style={{fontSize: 12, paddingTop: 3}}>19 July - 23 July</Text>
@@ -272,6 +286,12 @@ const styles = StyleSheet.create({
   heartOutImg: {
     height: Platform.isPad ? heightPercentage(4) : heightPercentage(5),
     width: Platform.isPad ? widthPercentage(6) : widthPercentage(10),
+    // backgroundColor : "red",
+    // marginBottom: 40
+  },
+  heartLikeImg: {
+    height: Platform.isPad ? heightPercentage(4) : heightPercentage(3),
+    width: Platform.isPad ? widthPercentage(6) : widthPercentage(8),
     // backgroundColor : "red",
     // marginBottom: 40
   },
@@ -356,8 +376,8 @@ const stateStyles = StyleSheet.create({
     width: '100%',
   },
   mapImg: {
-    height: Platform.isPad ? heightPercentage(4) : heightPercentage(2.8),
-    width: Platform.isPad ? widthPercentage(6) : widthPercentage(3.8),
+    height: Platform.isPad ? heightPercentage(4) : heightPercentage(2.2),
+    width: Platform.isPad ? widthPercentage(6) : widthPercentage(3.0),
     alignSelf: 'center',
     marginRight: 5,
   },

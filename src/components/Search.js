@@ -10,16 +10,28 @@ import {
   ScrollView,
   Pressable,
 } from 'react-native';
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {heightPercentage, isIpad, widthPercentage} from '../utils';
+import {useIsFocused} from '@react-navigation/native';
 import TextField from './TextField';
 import {Dropdown} from 'react-native-element-dropdown';
 import Rating from './Rating';
+import DummyHotelsData from '../utils/Data.json';
+import Feather from 'react-native-vector-icons/Feather';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const Search = ({navigation}) => {
+const Search = ({navigation, route}) => {
   const [email, setEmail] = useState('');
   const [selectedcountry, setSelectedCountry] = useState('');
   const [selectedguest, setseSectedGuest] = useState('');
+  const [HotelsData, setHotelsData] = useState([]);
+  const [likeState, setLikeState] = useState(false);
+
+
+  // console.log("HotelsData: ", HotelsData);
+
+  const isFocused = useIsFocused();
+
   const [slots, setSlots] = useState([
     {
       label: '12 July - 15 July',
@@ -57,6 +69,53 @@ const Search = ({navigation}) => {
     },
   ]);
 
+  console.log('HotelsData: ', HotelsData);
+
+  useEffect(() => {
+    (async () => {
+      let allHotelsData = await AsyncStorage.getItem('HotelsData');
+      let get_all_filters = await AsyncStorage.getItem('filters');
+      get_all_filters = JSON.parse(get_all_filters);
+      let allHotelsArr = JSON.parse(allHotelsData);
+      let newData = await allHotelsArr.filter(item => {
+        return (
+          item.rate >= get_all_filters?.range &&
+          item.rating >= get_all_filters?.rating &&
+          item.bedrooms >= get_all_filters?.bedrooms &&
+          item.distance <= get_all_filters?.sliderValue
+        );
+      });
+
+      setHotelsData(newData);
+    })();
+  }, [navigation, isFocused, likeState]);
+
+
+
+  const likeUnlikeHandle = async (id, type) => {
+    
+    let allHotelsData = await AsyncStorage.getItem('HotelsData');
+    let allArr =  JSON.parse(allHotelsData)
+
+    if (type == 'unlike') {
+      allArr?.forEach(item => {
+        if (item?.id == id) {
+          item["like"] = false;
+        }
+      });
+    } else{
+      allArr?.forEach(item => {
+        if (item?.id == id) {
+          item["like"] = true;
+        }
+      });
+    }
+    await AsyncStorage.setItem('HotelsData', JSON.stringify(allArr));
+    setLikeState(!likeState)
+
+    
+  };
+
   return (
     <View style={{flex: 1}}>
       <View style={styles.heading}>
@@ -69,7 +128,7 @@ const Search = ({navigation}) => {
         <Text style={[styles.headText, {textAlign: 'center'}]}>Search</Text>
         <TouchableOpacity onPress={() => navigation.navigate('Filters')}>
           <Image
-            source={require('../../assets/dots.png')}
+            source={require('../../assets/filter.png')}
             style={styles.heartImg}
           />
         </TouchableOpacity>
@@ -100,6 +159,7 @@ const Search = ({navigation}) => {
                 placeholderStyle={stateStyles.placeholderStyle}
                 selectedTextStyle={stateStyles.selectedTextStyle}
                 inputSearchStyle={stateStyles.inputSearchStyle}
+                itemTextStyle={stateStyles.itemText}
                 data={slots}
                 autoScroll={false}
                 maxHeight={200}
@@ -115,6 +175,7 @@ const Search = ({navigation}) => {
               <Dropdown
                 mode={'auto'}
                 style={[stateStyles.dropdown]}
+                itemTextStyle={stateStyles.itemText}
                 placeholderStyle={stateStyles.placeholderStyle}
                 selectedTextStyle={stateStyles.selectedTextStyle}
                 inputSearchStyle={stateStyles.inputSearchStyle}
@@ -154,25 +215,25 @@ const Search = ({navigation}) => {
                 marginTop: 15,
                 marginBottom: 10,
                 height: 48,
-                borderRadius: 25,
+                borderRadius: 30,
               }}>
               <Image
                 source={require('../../assets/done.png')}
-                style={{width: '100%', height: '100%'}}
+                style={{width: '100%', height: '100%', borderRadius: 30,}}
               />
             </TouchableOpacity>
           </View>
         </View>
         <View style={{flex: 1, height: '100%', marginTop: 30}}>
           <FlatList
-            data={[{id: 1}, {id: 2}, {id: 3}]}
+            data={HotelsData}
             style={{flex: 1}}
             keyExtractor={item => item?.id}
             showsVerticalScrollIndicator={false}
-            renderItem={item => {
+            renderItem={({item}, index) => {
               return (
                 <Pressable
-                  onPress={() => navigation.navigate('ProductDetails')}
+                  onPress={() => navigation.navigate('ProductDetails',{item})}
                   style={{
                     flex: 1,
                     alignSelf: 'center',
@@ -200,18 +261,26 @@ const Search = ({navigation}) => {
                     ]}
                     resizeMode="cover"
                     source={require('../../assets/pro.png')}>
-                    {item?.index == 1 ? (
-                      <Image
-                        source={require('../../assets/like.png')}
-                        resizeMode="contain"
-                        style={styles.playIcon}
-                      />
+                    {item?.like ? (
+                      <TouchableOpacity
+                        onPress={() =>
+                          likeUnlikeHandle(item?.id, 'unlike')
+                        }>
+                        <Image
+                          source={require('../../assets/like.png')}
+                          resizeMode="contain"
+                          style={styles.playIcon}
+                        />
+                      </TouchableOpacity>
                     ) : (
-                      <Image
-                        source={require('../../assets/unlike.png')}
-                        resizeMode="contain"
-                        style={styles.playIcon}
-                      />
+                      <TouchableOpacity
+                        onPress={() => likeUnlikeHandle(item?.id, 'like')}>
+                        <Image
+                          source={require('../../assets/unlike.png')}
+                          resizeMode="contain"
+                          style={styles.playIcon}
+                        />
+                      </TouchableOpacity>
                     )}
                   </ImageBackground>
                   <View
@@ -223,14 +292,19 @@ const Search = ({navigation}) => {
                       paddingHorizontal: 15,
                     }}>
                     <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                      <Rating rating={5} total={5} size={13} color={'yellow'} />
+                      <Rating
+                        rating={item?.rating}
+                        total={5}
+                        size={13}
+                        color={'yellow'}
+                      />
                       <Text
                         style={{
                           fontSize: 13,
                           paddingLeft: 7,
                           color: '#ced7d5',
                         }}>
-                        {'4.5'}
+                        {item?.rating}
                       </Text>
                     </View>
                     <Text style={{fontSize: 12}}>244 Reviews</Text>
@@ -242,9 +316,9 @@ const Search = ({navigation}) => {
                       color: 'black',
                       paddingLeft: 15,
                       paddingVertical: 5,
-                      letterSpacing: 1
+                      letterSpacing: 1,
                     }}>
-                    Bougainvillea Hotel
+                    {item?.name}
                   </Text>
                   <View
                     style={{
@@ -254,8 +328,13 @@ const Search = ({navigation}) => {
                       width: '100%',
                       paddingHorizontal: 15,
                     }}>
-                    <Text style={{color: '#439281', fontSize: 18, letterSpacing: 1}}>
-                      $250{' '}
+                    <Text
+                      style={{
+                        color: '#439281',
+                        fontSize: 18,
+                        letterSpacing: 1,
+                      }}>
+                      ${item?.rate}
                       <Text
                         style={{
                           color: '#ced7d5',
@@ -265,11 +344,16 @@ const Search = ({navigation}) => {
                         /night
                       </Text>
                     </Text>
-                    <Image
-                      source={require('../../assets/rigth.png')}
-                      resizeMode="contain"
-                      style={stateStyles.heartImg}
-                    />
+
+                    <View
+                      style={{borderRadius: 20, backgroundColor: '#c7d1cf'}}>
+                      <Feather
+                        name="arrow-right"
+                        color={'#ffffff'}
+                        size={isIpad ? 30 : 20}
+                        style={{padding: 5}}
+                      />
+                    </View>
                   </View>
                 </Pressable>
               );
@@ -351,6 +435,10 @@ const stateStyles = StyleSheet.create({
   selectedTextStyle: {
     fontSize: isIpad ? 10 : 12.5,
     color: 'gray',
+  },
+  itemText:{
+    fontSize: isIpad ? 20 : 14,
+    color: '#9f9f9f',
   },
   iconStyle: {
     width: 25,

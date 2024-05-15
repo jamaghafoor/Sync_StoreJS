@@ -1,6 +1,5 @@
 import React from 'react';
 import {StyleSheet, Image, View} from 'react-native';
-import Swiper from 'react-native-swiper';
 import {heightPercentage, isIpad, widthPercentage} from '../utils';
 import {SwiperFlatList} from 'react-native-swiper-flatlist';
 

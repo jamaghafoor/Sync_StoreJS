@@ -1,0 +1,54 @@
+{
+  "project_info": {
+    "project_number": "259932369552",
+    "project_id": "trofi-4c951",
+    "storage_bucket": "trofi-4c951.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:259932369552:android:702fb37600745f29239e15",
+        "android_client_info": {
+          "package_name": "com.trofibooking.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "259932369552-79dsml8m1rr6bu60o18uofb9rt15dlnl.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.trofibooking.app",
+            "certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
+          }
+        },
+        {
+          "client_id": "259932369552-gqhrdcru7v042u0gi6vuksmffm511cp4.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBLFlzsRFfZQ8-99oNrV-mWhT917Rs3Xs4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "259932369552-gqhrdcru7v042u0gi6vuksmffm511cp4.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "259932369552-gmk2ae7f4pvkvccr5o9j4g0i1lhi51nh.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.trofibooking.app"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

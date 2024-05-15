@@ -7,10 +7,40 @@ import {
   Platform,
   Image,
 } from 'react-native';
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import {heightPercentage, widthPercentage} from '../utils';
+import DummyData from '../utils/Data.json';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {useIsFocused} from '@react-navigation/native';
 
 const Favourite = ({navigation}) => {
+  const [favHotelsData, setFavHotelsData] = useState([]);
+  const [likeState, setLikeState] = useState(false);
+
+  const isFocused = useIsFocused();
+
+  useEffect(() => {
+    (async () => {
+      let hotelsData = await AsyncStorage.getItem('HotelsData');
+      let allHotesArr = JSON.parse(hotelsData);
+      let newData = await allHotesArr.filter(item => {
+        return item?.like;
+      });
+      setFavHotelsData(newData);
+    })();
+  }, [navigation, isFocused, likeState]);
+
+  const handleFav = async id => {
+    let favAll = favHotelsData;
+    favAll?.forEach(item => {
+      if (item?.id == id) {
+        item['like'] = false;
+      }
+    });
+    await AsyncStorage.setItem('HotelsData', JSON.stringify(favAll));
+    setLikeState(!likeState);
+  };
+
   return (
     <View style={{flex: 1}}>
       <View style={styles.heading}>
@@ -20,80 +50,96 @@ const Favourite = ({navigation}) => {
             style={styles.heartImg}
           />
         </TouchableOpacity>
-        <Text style={[styles.headText, {textAlign: 'center'}]}>Search</Text>
-        <TouchableOpacity
-        onPress={() => navigation.navigate("Filters")}>
+        <Text style={[styles.headText, {textAlign: 'center'}]}>Favorites</Text>
+        <TouchableOpacity onPress={() => navigation.navigate('Filters')}>
           <Image
             source={require('../../assets/filter.png')}
             style={styles.heartImg}
           />
         </TouchableOpacity>
       </View>
-      {[{name: 'Super Beds'}, {name: 'Twin Beds'}].map((item, index) => {
-        return (
-          <View
-            key={index + 1}
-            style={{
-              paddingHorizontal: 10,
-              paddingVertical: 10,
-              marginHorizontal: 15,
-              backgroundColor: 'white',
-              borderRadius: 15,
-              marginBottom: 20,
-            }}>
-            <Text style={{color: 'black', paddingBottom: 5}}>{item.name}</Text>
+      <ScrollView>
+        {favHotelsData?.map((item, index) => {
+          return (
             <View
+              key={index + 1}
               style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                justifyContent: 'space-between',
+                paddingHorizontal: 13,
+                paddingVertical: 13,
+                marginHorizontal: 15,
+                backgroundColor: 'white',
+                borderRadius: 15,
+                marginBottom: 20,
               }}>
+              <Text style={{color: 'black', paddingBottom: 5}}>
+                {item.name}
+              </Text>
               <View
                 style={{
                   flexDirection: 'row',
                   alignItems: 'center',
-                  width: '60%',
+                  justifyContent: 'space-between',
                 }}>
-                <View style={styles.samImg}>
-                  <Image
-                    source={require('../../assets/sample.png')}
-                    style={styles.subImg}
-                  />
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    width: '60%',
+                  }}>
+                  <View style={styles.samImg}>
+                    <Image
+                      source={require('../../assets/sample.png')}
+                      style={styles.subImg}
+                    />
+                  </View>
+
+                  <Text
+                    style={{
+                      fontSize: 13,
+                      paddingLeft: 10,
+                      letterSpacing: 0.6,
+                      paddingRight: 5,
+                    }}>
+                    {item?.descreption?.slice(0, 100)}
+                  </Text>
                 </View>
-                {index == 0 ? (
-                  <Text
-                    style={{fontSize: 13, paddingLeft: 10, letterSpacing: 0.6}}>
-                    The Kitchen Beds are Very Special which includes One room
-                    and a kitchen
-                  </Text>
-                ) : (
-                  <Text
-                    style={{fontSize: 13, paddingLeft: 10, letterSpacing: 0.6}}>
-                    The Twin Beds are Very Special which includes two in same
-                    room.
-                  </Text>
-                )}
-              </View>
-              <View style={{alignItems: 'center', alignSelf: 'flex-start'}}>
-                <Text>$165</Text>
-                <View style={styles.itemImg}>
-                  {index == 1 ? (
+                <View style={{alignItems: 'center', alignSelf: 'flex-start'}}>
+                  <Text>{item?.rate}</Text>
+                  <View style={styles.itemImg}>
+                    {item?.rating.toFixed(0) == 1 ? (
+                      <Image
+                        source={require('../../assets/Item-checked.png')}
+                        style={styles.subImg}
+                      />
+                    ) : item?.rating.toFixed(0) == 2 ? (
+                      <Image
+                        source={require('../../assets/Item.png')}
+                        style={styles.subImg}
+                      />
+                    ) : item?.rating.toFixed(0) == 3 ? (
+                      <Image
+                        source={require('../../assets/Item.png')}
+                        style={styles.subImg}
+                      />
+                    ) : (
+                      <Image
+                        source={require('../../assets/Item.png')}
+                        style={styles.subImg}
+                      />
+                    )}
+                  </View>
+                  <TouchableOpacity onPress={() => handleFav(item?.id)}>
                     <Image
-                      source={require('../../assets/Item-checked.png')}
-                      style={styles.subImg}
+                      source={require('../../assets/likedheart.png')}
+                      style={styles.likeImg}
                     />
-                  ) : (
-                    <Image
-                      source={require('../../assets/Item.png')}
-                      style={styles.subImg}
-                    />
-                  )}
+                  </TouchableOpacity>
                 </View>
               </View>
             </View>
-          </View>
-        );
-      })}
+          );
+        })}
+      </ScrollView>
     </View>
   );
 };
@@ -142,5 +188,11 @@ const styles = StyleSheet.create({
     width: '100%',
     borderRadius: 10,
     overflow: 'hidden',
+  },
+  likeImg: {
+    height: Platform.isPad ? heightPercentage(4) : heightPercentage(2.4),
+    width: Platform.isPad ? widthPercentage(6) : widthPercentage(6),
+    alignSelf: 'center',
+    marginTop: 10,
   },
 });

@@ -1,4 +1,4 @@
-package com.sync_store.newarchitecture.modules;
+package com.trofibooking.app.newarchitecture.modules;
 
 import com.facebook.jni.HybridData;
 import com.facebook.react.ReactPackage;
