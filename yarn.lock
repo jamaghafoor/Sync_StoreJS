@@ -1279,13 +1279,18 @@
   resolved "https://registry.yarnpkg.com/@react-native-community/slider/-/slider-4.2.1.tgz#8f1c8cf62de1bd91ce1e32585f7eb666f21e5025"
   integrity sha512-6HUS5HbB9bvEN4GiwBlxECgPWQIugHE+kfnxqX2jHUl1SE57MRpw00m1qVs4hXtEPQndBl6mAQiGbKCOtLPVbg==
 
-"@react-native-firebase/app@^19.2.2":
-  version "19.2.2"
-  resolved "https://registry.yarnpkg.com/@react-native-firebase/app/-/app-19.2.2.tgz#71db0afdfaa41fff1fc75ce9f5c249eeeec393e3"
-  integrity sha512-yucIZT/n567XH+gU8Qf/Z8Awtrc0dadu0LYDJU/dq228DwoQa8xyCoDqXqVM2Ppj9R8csQ+ga4VdMYBSHblYQw==
+"@react-native-firebase/app@18.1.0":
+  version "18.1.0"
+  resolved "https://registry.yarnpkg.com/@react-native-firebase/app/-/app-18.1.0.tgz#35b21dc8003026542b2b545ee924d367302dd9fc"
+  integrity sha512-GZSlkNjSZlyB6I2t/5MmD9uDvnteyPOzvYNshaffS/hzRK6LL+3xYTnxqwPl6Kntm8z28FdaQM06OIlkPGQ3+g==
   dependencies:
-    opencollective-postinstall "^2.0.3"
+    opencollective-postinstall "^2.0.1"
     superstruct "^0.6.2"
+
+"@react-native-firebase/database@18.1.0":
+  version "18.1.0"
+  resolved "https://registry.yarnpkg.com/@react-native-firebase/database/-/database-18.1.0.tgz#cf35d2d9f97e521aa8153b45e3e1ff15f75acb4f"
+  integrity sha512-PXCC4UGIo3Eg2aDFlfKlSAqE+VuZIPeTaFvAT/vIMWlD3PxSDly3iJN/pVE88XnQxr7VO2PUYg0x25Mpmml00w==
 
 "@react-native-google-signin/google-signin@^11.0.1":
   version "11.0.1"
@@ -2333,9 +2338,9 @@ camelcase@^6.0.0:
   integrity sha512-Gmy6FhYlCY7uOElZUSbxo2UCDH8owEk996gkbrpsgGtrJLM3J7jGxl9Ic7Qwwj4ivOE5AWZWRMecDdF7hqGjFA==
 
 caniuse-lite@^1.0.30001587:
-  version "1.0.30001618"
-  resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30001618.tgz#fad74fa006aef0f01e8e5c0a5540c74d8d36ec6f"
-  integrity sha512-p407+D1tIkDvsEAPS22lJxLQQaG8OTBEqo0KhzfABGk0TU4juBNDSfH0hyAp/HRyx+M8L17z/ltyhxh27FTfQg==
+  version "1.0.30001620"
+  resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30001620.tgz#78bb6f35b8fe315b96b8590597094145d0b146b4"
+  integrity sha512-WJvYsOjd1/BYUY6SNGUosK9DUidBPDTnOARHp3fSmFO1ekdxaY6nKRttEVrfMmYi80ctS0kz1wiWmm14fVc3ew==
 
 capture-exit@^2.0.0:
   version "2.0.0"
@@ -2865,9 +2870,9 @@ ee-first@1.1.1:
   integrity sha512-WMwm9LhRUo+WUaRN+vRuETqG89IgZphVSNkdFgeb6sS/E4OrDIN7t48CAewSHXc6C8lefD8KKfr5vY61brQlow==
 
 electron-to-chromium@^1.4.668:
-  version "1.4.768"
-  resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.4.768.tgz#3795bd000ccb8978be1af2d06320b2dac810a372"
-  integrity sha512-z2U3QcvNuxdkk33YV7R1bVMNq7fL23vq3WfO5BHcqrm4TnDGReouBfYKLEFh5umoK1XACjEwp8mmnhXk2EJigw==
+  version "1.4.774"
+  resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.4.774.tgz#1017d1758aaeeefe5423aa9d67b4b1e5d1d0a856"
+  integrity sha512-132O1XCd7zcTkzS3FgkAzKmnBuNJjK8WjcTtNuoylj7MYbqw5eXehjQ5OK91g0zm7OTKIPeaAG4CPoRfD9M1Mg==
 
 emittery@^0.7.1:
   version "0.7.2"
@@ -5924,7 +5929,7 @@ open@^6.2.0:
   dependencies:
     is-wsl "^1.1.0"
 
-opencollective-postinstall@^2.0.3:
+opencollective-postinstall@^2.0.1:
   version "2.0.3"
   resolved "https://registry.yarnpkg.com/opencollective-postinstall/-/opencollective-postinstall-2.0.3.tgz#7a0fff978f6dbfa4d006238fbac98ed4198c3259"
   integrity sha512-8AV/sCtuzUeTo8gQK5qDZzARrulB3egtLzFgteqB2tcT4Mw7B8Kt7JcDHmltjz6FOAHsvTevk70gZEbhM4ZS9Q==
@@ -6313,6 +6318,11 @@ react-native-gesture-handler@2.14.1:
     invariant "^2.2.4"
     lodash "^4.17.21"
     prop-types "^15.7.2"
+
+react-native-get-location@^4.0.1:
+  version "4.0.1"
+  resolved "https://registry.yarnpkg.com/react-native-get-location/-/react-native-get-location-4.0.1.tgz#0687e224889f33420377bd0d716f4136af9129df"
+  integrity sha512-blDWHI7f+gfzXbrrlFNRjpVMuuMTng3hsKR0Yi3iPNIM5LRs0EJDYvvdQaauFk7mJPryOxRE3+A5XAr+3kkpFg==
 
 react-native-gradle-plugin@^0.70.2:
   version "0.70.3"

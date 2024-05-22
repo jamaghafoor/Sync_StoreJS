@@ -15,6 +15,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import {LoginManager, Profile} from 'react-native-fbsdk-next';
 import DummyHotelsData from '../utils/Data.json';
 import {useIsFocused} from '@react-navigation/native';
+import GetLocation from 'react-native-get-location';
 
 const UserProfile = ({navigation, route}) => {
   const isFocused = useIsFocused();
@@ -36,6 +37,17 @@ const UserProfile = ({navigation, route}) => {
         offlineAccess: true,
       });
       await AsyncStorage.setItem('HotelsData', JSON.stringify(DummyHotelsData));
+      GetLocation.getCurrentPosition({
+        enableHighAccuracy: true,
+        timeout: 60000,
+      })
+        .then(location => {
+          console.log("User location: ",location );
+        })
+        .catch(error => {
+          const {code, message} = error;
+          console.warn(code, message);
+        });
     })();
   }, [isFocused, navigation, route]);
 

@@ -17,12 +17,24 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import {Slider} from '@miblanchard/react-native-slider';
 // import DummyData from '../utils/Data.json';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import database from '@react-native-firebase/database';
 
 const Filters = ({navigation}) => {
-  const [bedrooms, setBedrooms] = useState(1);
+  const [bedrooms, setBedrooms] = useState(true);
+  const [bedrooms2, setBedrooms2] = useState(false);
+  const [bedrooms3, setBedrooms3] = useState(false);
+  const [bedrooms4, setBedrooms4] = useState(false);
   const [studio, setStudio] = useState(false);
-  const [rating, setRating] = useState(4);
-  const [range, setRange] = useState(100);
+  const [rating, setRating] = useState(false);
+  const [rating1, setRating1] = useState(false);
+  const [rating2, setRating2] = useState(false);
+  const [rating3, setRating3] = useState(false);
+  const [rating4, setRating4] = useState(true);
+  const [range, setRange] = useState(true);
+  const [range1, setRange1] = useState(false);
+  const [range2, setRange2] = useState(false);
+  const [range3, setRange3] = useState(false);
+  const [range4, setRange4] = useState(false);
   const [sliderValue, setSliderValue] = useState(5);
   const [hoTelsdata, setHotelsData] = useState(5);
   const [showNumbers, setShowNumbers] = useState('');
@@ -46,7 +58,7 @@ const Filters = ({navigation}) => {
     } else {
       setRating(null);
     }
-    handleShowResult();
+    // handleShowResult();
   };
 
   const handleReset = () => {
@@ -63,19 +75,24 @@ const Filters = ({navigation}) => {
       let DummyData = await AsyncStorage.getItem('HotelsData');
       DummyData = JSON.parse(DummyData);
       setHotelsData(DummyData);
+      // handleShowResult(DummyData);
+      // const reference = database();
+      // console.log('reference: ', reference);
     })();
   }, [navigation]);
 
-  const handleShowResult = async () => {
-    let newData = await hoTelsdata.filter(item => {
+  const handleShowResult = async DummyData => {
+    let filterData = DummyData || hoTelsdata;
+    let newData = await filterData.filter(item => {
       return (
-        item.rate >= range &&
-        item.rating >= rating &&
-        item.bedrooms >= bedrooms &&
-        item.distance <= sliderValue
+        item?.studio == studio &&
+        range >= item.rate &&
+        rating >= item.rating &&
+        bedrooms >= item?.bedrooms &&
+        sliderValue >= item.distance
       );
     });
-    setShowNumbers(newData?.length);
+    setShowNumbers(newData);
   };
 
   return (
@@ -112,7 +129,7 @@ const Filters = ({navigation}) => {
               value={sliderValue}
               onValueChange={value => {
                 setSliderValue(value);
-                handleShowResult();
+                // handleShowResult();
               }}
               step={0.5}
               minimumValue={0}
@@ -136,9 +153,11 @@ const Filters = ({navigation}) => {
                 justifyContent: 'space-between',
                 paddingTop: 10,
               }}>
-              <Text style={{fontSize: 12.5, color: "#6f7574"}}>Near Me</Text>
-              <Text style={{fontSize: 12.5, color: "#6f7574"}}>{sliderValue} KM</Text>
-              <Text style={{fontSize: 12.5, color: "#6f7574"}}>10 KM</Text>
+              <Text style={{fontSize: 12.5, color: '#6f7574'}}>Near Me</Text>
+              <Text style={{fontSize: 12.5, color: '#6f7574'}}>
+                {sliderValue} KM
+              </Text>
+              <Text style={{fontSize: 12.5, color: '#6f7574'}}>10 KM</Text>
             </View>
           </View>
         </View>
@@ -165,72 +184,72 @@ const Filters = ({navigation}) => {
               </Text>
             </Pressable>
             <Pressable
-              onPress={() => handleSetRating(1)}
-              style={rating != 1 ? styles.tab : styles.selectedTab}>
+              onPress={() => setRating1(!rating1)}
+              style={!rating1 ? styles.tab : styles.selectedTab}>
               <FontAwesome
                 name="star"
-                color={rating == 1 ? 'white' : '#ffbc02'}
+                color={rating1 ? 'white' : '#ffbc02'}
                 size={isIpad ? 30 : 16}
                 style={{marginRight: 5}}
               />
               <Text
                 style={{
                   fontSize: 12.5,
-                  color: rating == 1 ? 'white' : '#6f7574',
+                  color: rating1 ? 'white' : '#6f7574',
                 }}>
                 {' '}
                 1
               </Text>
             </Pressable>
             <Pressable
-              onPress={() => handleSetRating(2)}
-              style={rating != 2 ? styles.tab : styles.selectedTab}>
+              onPress={() => setRating2(!rating2)}
+              style={!rating2 ? styles.tab : styles.selectedTab}>
               <FontAwesome
                 name="star"
-                color={rating == 2 ? 'white' : '#ffbc02'}
+                color={rating2 ? 'white' : '#ffbc02'}
                 size={isIpad ? 30 : 16}
                 style={{marginRight: 5}}
               />
               <Text
                 style={{
                   fontSize: 12.5,
-                  color: rating == 2 ? 'white' : '#6f7574',
+                  color: rating2 ? 'white' : '#6f7574',
                 }}>
                 {' '}
                 2
               </Text>
             </Pressable>
             <Pressable
-              onPress={() => handleSetRating(3)}
-              style={rating != 3 ? styles.tab : styles.selectedTab}>
+              onPress={() => setRating3(!rating3)}
+              style={!rating3 ? styles.tab : styles.selectedTab}>
               <FontAwesome
                 name="star"
-                color={rating == 3 ? 'white' : '#ffbc02'}
+                color={rating3 ? 'white' : '#ffbc02'}
                 size={isIpad ? 30 : 16}
                 style={{marginRight: 5}}
               />
               <Text
                 style={{
                   fontSize: 12.5,
-                  color: rating == 3 ? 'white' : '#6f7574',
+                  color: rating3 ? 'white' : '#6f7574',
                 }}>
                 {' '}
                 3
               </Text>
             </Pressable>
             <Pressable
-              onPress={() => handleSetRating(4)}
-              style={rating != 4 ? styles.tab : styles.selectedTab}>
+              onPress={() => setRating4(!rating4)}
+              style={!rating4 ? styles.tab : styles.selectedTab}>
               <FontAwesome
                 name="star"
-                color={rating == 4 ? 'white' : '#ffbc02'}
+                color={rating4 ? 'white' : '#ffbc02'}
                 size={isIpad ? 30 : 16}
                 style={{marginRight: 5}}
               />
               <Text
                 style={{
                   fontSize: 12.5,
-                  color: rating == 4 ? 'white' : '#6f7574',
+                  color: rating4 ? 'white' : '#6f7574',
                 }}>
                 {' '}
                 4+
@@ -256,7 +275,10 @@ const Filters = ({navigation}) => {
                 alignItems: 'center',
                 justifyContent: 'space-between',
               }}>
-              <Text style={{fontSize: 13, letterSpacing: 0.6, color: "#6f7574"}}>Studio</Text>
+              <Text
+                style={{fontSize: 13, letterSpacing: 0.6, color: '#6f7574'}}>
+                Studio
+              </Text>
               {
                 <Pressable
                   style={styles.checkImg}
@@ -265,6 +287,7 @@ const Filters = ({navigation}) => {
                       LayoutAnimation.Presets.easeInEaseOut,
                     );
                     setStudio(!studio);
+                    // handleShowResult()
                   }}>
                   {studio ? (
                     <Image
@@ -296,7 +319,8 @@ const Filters = ({navigation}) => {
                 alignItems: 'center',
                 justifyContent: 'space-between',
               }}>
-              <Text style={{fontSize: 13, letterSpacing: 0.6, color: "#6f7574"}}>
+              <Text
+                style={{fontSize: 13, letterSpacing: 0.6, color: '#6f7574'}}>
                 One Bedrooms
               </Text>
               {
@@ -306,10 +330,10 @@ const Filters = ({navigation}) => {
                     LayoutAnimation.configureNext(
                       LayoutAnimation.Presets.easeInEaseOut,
                     );
-                    setBedrooms(1);
-                    handleShowResult();
+                    setBedrooms(!bedrooms);
+                    // handleShowResult();
                   }}>
-                  {bedrooms == 1 ? (
+                  {bedrooms ? (
                     <Image
                       source={require('../../assets/check.png')}
                       style={{height: '100%', width: '100%'}}
@@ -341,7 +365,8 @@ const Filters = ({navigation}) => {
                   alignItems: 'center',
                   justifyContent: 'space-between',
                 }}>
-                <Text style={{fontSize: 13, letterSpacing: 0.6, color: "#6f7574"}}>
+                <Text
+                  style={{fontSize: 13, letterSpacing: 0.6, color: '#6f7574'}}>
                   Two Bedrooms
                 </Text>
                 {
@@ -351,10 +376,10 @@ const Filters = ({navigation}) => {
                       LayoutAnimation.configureNext(
                         LayoutAnimation.Presets.easeInEaseOut,
                       );
-                      setBedrooms(2);
-                      handleShowResult();
+                      setBedrooms2(!bedrooms2);
+                      // handleShowResult();
                     }}>
-                    {bedrooms == 2 ? (
+                    {bedrooms2 ? (
                       <Image
                         source={require('../../assets/check.png')}
                         style={{height: '100%', width: '100%'}}
@@ -387,7 +412,8 @@ const Filters = ({navigation}) => {
                   alignItems: 'center',
                   justifyContent: 'space-between',
                 }}>
-                <Text style={{fontSize: 13, letterSpacing: 0.6, color: "#6f7574"}}>
+                <Text
+                  style={{fontSize: 13, letterSpacing: 0.6, color: '#6f7574'}}>
                   Three Bedrooms
                 </Text>
                 {
@@ -397,10 +423,10 @@ const Filters = ({navigation}) => {
                       LayoutAnimation.configureNext(
                         LayoutAnimation.Presets.easeInEaseOut,
                       );
-                      setBedrooms(3);
-                      handleShowResult();
+                      setBedrooms3(!bedrooms3);
+                      // handleShowResult();
                     }}>
-                    {bedrooms == 3 ? (
+                    {bedrooms3 ? (
                       <Image
                         source={require('../../assets/check.png')}
                         style={{height: '100%', width: '100%'}}
@@ -433,7 +459,8 @@ const Filters = ({navigation}) => {
                   alignItems: 'center',
                   justifyContent: 'space-between',
                 }}>
-                <Text style={{fontSize: 13, letterSpacing: 0.6, color: "#6f7574"}}>
+                <Text
+                  style={{fontSize: 13, letterSpacing: 0.6, color: '#6f7574'}}>
                   Four+ Bedrooms
                 </Text>
                 {
@@ -443,10 +470,10 @@ const Filters = ({navigation}) => {
                       LayoutAnimation.configureNext(
                         LayoutAnimation.Presets.easeInEaseOut,
                       );
-                      setBedrooms(4);
-                      handleShowResult();
+                      setBedrooms4(!bedrooms4);
+                      // handleShowResult();
                     }}>
-                    {bedrooms == 4 ? (
+                    {bedrooms4 ? (
                       <Image
                         source={require('../../assets/check.png')}
                         style={{height: '100%', width: '100%'}}
@@ -499,7 +526,10 @@ const Filters = ({navigation}) => {
                 alignItems: 'center',
                 justifyContent: 'space-between',
               }}>
-              <Text style={{fontSize: 13, letterSpacing: 0.6, color: "#6f7574"}}>$1 - $100</Text>
+              <Text
+                style={{fontSize: 13, letterSpacing: 0.6, color: '#6f7574'}}>
+                $1 - $100
+              </Text>
               {
                 <Pressable
                   style={styles.checkImg}
@@ -507,10 +537,10 @@ const Filters = ({navigation}) => {
                     LayoutAnimation.configureNext(
                       LayoutAnimation.Presets.easeInEaseOut,
                     );
-                    setRange(100);
-                    handleShowResult();
+                    setRange(!range);
+                    // handleShowResult();
                   }}>
-                  {range == 100 ? (
+                  {range ? (
                     <Image
                       source={require('../../assets/check.png')}
                       style={{height: '100%', width: '100%'}}
@@ -542,7 +572,8 @@ const Filters = ({navigation}) => {
                   alignItems: 'center',
                   justifyContent: 'space-between',
                 }}>
-                <Text style={{fontSize: 13, letterSpacing: 0.6, color: "#6f7574"}}>
+                <Text
+                  style={{fontSize: 13, letterSpacing: 0.6, color: '#6f7574'}}>
                   $101 - $200
                 </Text>
                 {
@@ -552,10 +583,10 @@ const Filters = ({navigation}) => {
                       LayoutAnimation.configureNext(
                         LayoutAnimation.Presets.easeInEaseOut,
                       );
-                      setRange(200);
-                      handleShowResult();
+                      setRange1(!range1);
+                      // handleShowResult();
                     }}>
-                    {range == 200 ? (
+                    {range1 ? (
                       <Image
                         source={require('../../assets/check.png')}
                         style={{height: '100%', width: '100%'}}
@@ -588,7 +619,8 @@ const Filters = ({navigation}) => {
                   alignItems: 'center',
                   justifyContent: 'space-between',
                 }}>
-                <Text style={{fontSize: 13, letterSpacing: 0.6, color: "#6f7574"}}>
+                <Text
+                  style={{fontSize: 13, letterSpacing: 0.6, color: '#6f7574'}}>
                   $201 - $300
                 </Text>
                 {
@@ -598,10 +630,10 @@ const Filters = ({navigation}) => {
                       LayoutAnimation.configureNext(
                         LayoutAnimation.Presets.easeInEaseOut,
                       );
-                      setRange(300);
-                      handleShowResult();
+                      setRange2(!range2);
+                      // handleShowResult();
                     }}>
-                    {range == 300 ? (
+                    {range2 ? (
                       <Image
                         source={require('../../assets/check.png')}
                         style={{height: '100%', width: '100%'}}
@@ -635,7 +667,8 @@ const Filters = ({navigation}) => {
                   alignItems: 'center',
                   justifyContent: 'space-between',
                 }}>
-                <Text style={{fontSize: 13, letterSpacing: 0.6, color: "#6f7574"}}>
+                <Text
+                  style={{fontSize: 13, letterSpacing: 0.6, color: '#6f7574'}}>
                   $301 - $400
                 </Text>
                 {
@@ -645,10 +678,10 @@ const Filters = ({navigation}) => {
                       LayoutAnimation.configureNext(
                         LayoutAnimation.Presets.easeInEaseOut,
                       );
-                      setRange(400);
-                      handleShowResult();
+                      setRange3(!range3);
+                      // handleShowResult();
                     }}>
-                    {range == 400 ? (
+                    {range3 ? (
                       <Image
                         source={require('../../assets/check.png')}
                         style={{height: '100%', width: '100%'}}
@@ -681,7 +714,8 @@ const Filters = ({navigation}) => {
                   alignItems: 'center',
                   justifyContent: 'space-between',
                 }}>
-                <Text style={{fontSize: 13, letterSpacing: 0.6, color: "#6f7574"}}>
+                <Text
+                  style={{fontSize: 13, letterSpacing: 0.6, color: '#6f7574'}}>
                   $401 - $500
                 </Text>
                 {
@@ -691,10 +725,10 @@ const Filters = ({navigation}) => {
                       LayoutAnimation.configureNext(
                         LayoutAnimation.Presets.easeInEaseOut,
                       );
-                      setRange(500);
-                      handleShowResult();
+                      setRange4(!range4);
+                      // handleShowResult();
                     }}>
-                    {range == 500 ? (
+                    {range4 ? (
                       <Image
                         source={require('../../assets/check.png')}
                         style={{height: '100%', width: '100%'}}
@@ -735,13 +769,27 @@ const Filters = ({navigation}) => {
           onPress={async () => {
             await AsyncStorage.setItem(
               'filters',
-              JSON.stringify({range, rating, bedrooms, sliderValue}),
+              JSON.stringify({
+                studio,
+                range,
+                range1,
+                range2,
+                range3,
+                range4,
+                rating1,
+                rating2,
+                rating3,
+                rating4,
+                bedrooms,
+                bedrooms2,
+                bedrooms3,
+                bedrooms4,
+                sliderValue,
+              }),
             );
-            navigation.navigate('search')
-            }}>
-          <Text style={{color: 'white'}}>
-            Show {showNumbers > 0 ? showNumbers : ''} Results
-          </Text>
+            navigation.navigate('search');
+          }}>
+          <Text style={{color: 'white'}}>Show Results</Text>
         </Pressable>
       </ScrollView>
     </View>

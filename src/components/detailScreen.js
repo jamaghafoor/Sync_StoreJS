@@ -20,31 +20,29 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const ProductDetails = ({navigation, route}) => {
   const product = route?.params?.item;
-  console.log(" product:", product)
+  console.log(' product:', product);
   const [showMoreDetails, setShowMoreDteails] = useState(false);
   const [itemLiked, setItemLiked] = useState(product?.like);
 
   const likeUnlikeHandle = async (id, type) => {
-    setItemLiked(!itemLiked)
+    setItemLiked(!itemLiked);
     let allHotelsData = await AsyncStorage.getItem('HotelsData');
-    let allArr =  JSON.parse(allHotelsData)
+    let allArr = JSON.parse(allHotelsData);
 
     if (type == 'unlike') {
       allArr?.forEach(item => {
         if (item?.id == id) {
-          item["like"] = false;
+          item['like'] = false;
         }
       });
-    } else{
+    } else {
       allArr?.forEach(item => {
         if (item?.id == id) {
-          item["like"] = true;
+          item['like'] = true;
         }
       });
     }
     await AsyncStorage.setItem('HotelsData', JSON.stringify(allArr));
-
-    
   };
 
   return (
@@ -59,15 +57,21 @@ const ProductDetails = ({navigation, route}) => {
         <Text style={[styles.headText, {textAlign: 'center'}]}>
           Hotel OverView
         </Text>
-        <TouchableOpacity 
-        onPress={() => likeUnlikeHandle(product?.id, itemLiked ? "unlike" : "like")}>
-          {itemLiked ? <Image
-            source={require('../../assets/heart-checked.png')}
-            style={styles.heartLikeImg}
-          /> : <Image
-            source={require('../../assets/heart-out.png')}
-            style={styles.heartOutImg}
-          />}
+        <TouchableOpacity
+          onPress={() =>
+            likeUnlikeHandle(product?.id, itemLiked ? 'unlike' : 'like')
+          }>
+          {itemLiked ? (
+            <Image
+              source={require('../../assets/heart-checked.png')}
+              style={styles.heartLikeImg}
+            />
+          ) : (
+            <Image
+              source={require('../../assets/heart-out.png')}
+              style={styles.heartOutImg}
+            />
+          )}
         </TouchableOpacity>
       </View>
       <ScrollView style={{flex: 1, height: '100%'}}>
@@ -104,8 +108,7 @@ const ProductDetails = ({navigation, route}) => {
           </ImageBackground> */}
           <Carousel
             images={[
-              require('../../assets/pro.png'),
-              require('../../assets/sample.png'),
+              {uri: product.image},
               require('../../assets/pro.png'),
             ]}
           />
@@ -123,9 +126,14 @@ const ProductDetails = ({navigation, route}) => {
                 alignItems: 'center',
                 marginTop: 3,
               }}>
-              <Rating maxSize={true} />
+              <Rating
+                rating={product?.rating}
+                total={5}
+                size={15}
+                color={'#e67f44'}
+              />
               <Text style={{fontSize: 13, paddingLeft: 7, color: '#ced7d5'}}>
-                {product?.rating}
+                {product?.rating.toFixed(1)}
               </Text>
             </View>
             <Text style={{fontSize: 12}}></Text>
@@ -139,7 +147,7 @@ const ProductDetails = ({navigation, route}) => {
               paddingVertical: 5,
               letterSpacing: 1,
             }}>
-           {product?.name}
+            {product?.name}
           </Text>
           <View
             style={{
@@ -155,7 +163,7 @@ const ProductDetails = ({navigation, route}) => {
               style={stateStyles.mapImg}
             />
             <Text style={{fontSize: 13, letterSpacing: 1}}>
-             {product?.location}
+              {product?.location}
             </Text>
           </View>
           <View
@@ -174,9 +182,19 @@ const ProductDetails = ({navigation, route}) => {
               width: '100%',
               paddingHorizontal: 15,
             }}>
-           {product?.guests > 0 && <Text style={styles.tab}>{product?.guests} {product?.guests > 1 ? "Guests" : "Guest"}</Text>}
-            <Text style={styles.tab}>{product?.bedrooms} {product?.bedrooms > 1 ? "Bedrooms" : "Bedroom"}</Text>
-            <Text style={styles.tab}>{product?.bathrooms} {product?.bathrooms > 1 ? "Bathrooms" : "Bathroom"}</Text>
+            {product?.guests > 0 && (
+              <Text style={styles.tab}>
+                {product?.guests} {product?.guests > 1 ? 'Guests' : 'Guest'}
+              </Text>
+            )}
+            <Text style={styles.tab}>
+              {product?.bedrooms}{' '}
+              {product?.bedrooms > 1 ? 'Bedrooms' : 'Bedroom'}
+            </Text>
+            <Text style={styles.tab}>
+              {product?.bathrooms}{' '}
+              {product?.bathrooms > 1 ? 'Bathrooms' : 'Bathroom'}
+            </Text>
           </View>
           <View
             style={{
@@ -187,7 +205,7 @@ const ProductDetails = ({navigation, route}) => {
               paddingHorizontal: 15,
               marginTop: 15,
             }}>
-           {product?.studio && <Text style={styles.tab}>Studio</Text>}
+            {product?.studio && <Text style={styles.tab}>Studio</Text>}
           </View>
         </View>
 
@@ -196,25 +214,23 @@ const ProductDetails = ({navigation, route}) => {
             LayoutAnimation.configureNext(LayoutAnimation.Presets.linear);
             setShowMoreDteails(!showMoreDetails);
           }}>
-            <View>
-
-            
-          <View style={{paddingHorizontal: 15}}>
-            {!showMoreDetails && (
-              <Text style={{fontSize: 13, letterSpacing: 0.9, marginTop: 10}}>
-               {product?.descreption.slice(0,200)}
-                <Text style={styles.viewMore}>{' Read More'}</Text>
-              </Text>
-            )}
-          </View>
-          <View style={{paddingHorizontal: 15}}>
-              {showMoreDetails && (
-                <Text style={{fontSize: 13, letterSpacing: 0.9,}}>
-                 {product?.descreption}
+          <View>
+            <View style={{paddingHorizontal: 15}}>
+              {!showMoreDetails && (
+                <Text style={{fontSize: 13, letterSpacing: 0.9, marginTop: 10}}>
+                  {product?.descreption.slice(0, 200)}
+                  <Text style={styles.viewMore}>{' Read More'}</Text>
                 </Text>
               )}
             </View>
+            <View style={{paddingHorizontal: 15}}>
+              {showMoreDetails && (
+                <Text style={{fontSize: 13, letterSpacing: 0.9}}>
+                  {product?.descreption}
+                </Text>
+              )}
             </View>
+          </View>
         </TouchableWithoutFeedback>
 
         <View
@@ -240,9 +256,9 @@ const ProductDetails = ({navigation, route}) => {
             </Text>
             <Text style={{fontSize: 12, paddingTop: 3}}>19 July - 23 July</Text>
           </View>
-          <TouchableOpacity 
-          onPress={() => navigation.navigate("Details")}
-          style={stateStyles.detailImg}>
+          <TouchableOpacity
+            onPress={() => navigation.navigate('Details')}
+            style={stateStyles.detailImg}>
             <Image
               source={require('../../assets/detail.png')}
               style={stateStyles.btnImg}

@@ -9,6 +9,8 @@ import {
   Alert,
   Dimensions,
   ImageBackground,
+  UIManager,
+  LayoutAnimation,
 } from 'react-native';
 import React, {useEffect, useState, useCallback, useRef} from 'react';
 import MapboxGl from '@rnmapbox/maps';
@@ -17,6 +19,8 @@ import TextField from './TextField';
 import MapStyles from '../../assets/style.json';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Carousel from 'react-native-snap-carousel';
+import MapMarkers from "../utils/markersData.json"
+
 const markerCount = 5;
 // const centerCoord = ;
 const allColors = ['red', 'green', 'blue', 'purple'];
@@ -28,7 +32,9 @@ const Location = ({navigation}) => {
   const [anchor, setAnchor] = useState({x: 0.5, y: 0.5});
   const [allowOverlap, setAllowOverlap] = useState(true);
   const [selectedHotel, setSelectedHotel] = useState({});
-  const [centerCoord, setCenteredCoords] = useState([72.86718047737594, 19.07715994556233]);
+  const [centerCoord, setCenteredCoords] = useState([
+    72.86718047737594, 19.07715994556233,
+  ]);
   const flatRef = useRef(null);
   const [size, setSize] = useState(1);
   const width = Dimensions.get('window').width;
@@ -59,47 +65,18 @@ const Location = ({navigation}) => {
   }, [navigation]);
 
   const randomizeCoordinatesAndColors = useCallback(() => {
-    const newMarkers = new Array(markerCount).fill(0).map((o, i) => {
+    const newMarkers = MapMarkers?.map((marker, i) => {
       return {
-        id: i+1,
+        ...marker,
         coords: [
           centerCoord[0] + (Math.random() - 0.6) * 0.015,
           centerCoord[1] + (Math.random() - 0.6) * 0.015,
         ],
-        color: allColors[i % allColors.length],
-        rating: Math.random() * 4 + 1,
-        name: !i
-          ? 'Bougainvillea Hotel'
-          : i == 1
-          ? 'Delta Plaza Hotel'
-          : i == 2
-          ? 'The Clock Towers'
-          : i == 3
-          ? 'Elaf Ajyad Hotel'
-          : 'Raffles Makkah Palace',
-        location: !i
-          ? 'Salesforce Tower, London'
-          : i == 1
-          ? 'Canada Square, London'
-          : i == 2
-          ? 'Al Haram, KSA'
-          : i == 3
-          ? 'Elaf Ajyad Hotel'
-          : 'Royal Tower, KSA',
-        rate: !i
-          ? '$150'
-          : i == 1
-          ? '$180'
-          : i == 2
-          ? '$230'
-          : i == 3
-          ? '$600'
-          : '$350',
-      };
+        color: allColors[i % allColors.length]
+      }
     });
-
     setMarkers(newMarkers);
-    setSelectedItem(newMarkers[0])
+    setSelectedItem(newMarkers[0]);
   }, []);
 
   useEffect(() => {
@@ -108,8 +85,8 @@ const Location = ({navigation}) => {
   }, [centerCoord]);
 
   const scrollToIndex = index => {
-    console.log("flatRef?.current: ", flatRef?.current)
-}
+    console.log('flatRef?.current: ', flatRef?.current);
+  };
 
   const defaultStyle = {
     version: 8,
@@ -121,7 +98,7 @@ const Location = ({navigation}) => {
         tiles: ['https://a.tile.openstreetmap.org/{z}/{x}/{y}.png'],
         tileSize: 256,
         minzoom: 1,
-        maxzoom: 19,
+        maxzoom: 10,
       },
     },
     layers: [
@@ -151,24 +128,32 @@ const Location = ({navigation}) => {
   const _viewabilityConfig = {
     minimumViewTime: 50,
     waitForInteraction: true,
-    itemVisiblePercentThreshold: 80
-}
+    itemVisiblePercentThreshold: 80,
+  };
 
-const onViewCallBack = React.useCallback((viewableItems)=> {
-  if(viewableItems?.viewableItems[0]?.isViewable){
-    setSelectedItem(viewableItems?.viewableItems[0]?.item)
+  const onViewCallBack = React.useCallback(viewableItems => {
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+
+    if (viewableItems?.viewableItems[0]?.isViewable) {
+      setSelectedItem(viewableItems?.viewableItems[0]?.item);
+    }
+
+    // Use viewable items in state or as intended
+  }, []);
+
+  if (
+    Platform.OS === 'android' &&
+    UIManager.setLayoutAnimationEnabledExperimental
+  ) {
+    UIManager.setLayoutAnimationEnabledExperimental(true);
   }
-  
-  // Use viewable items in state or as intended
-}, []) 
-  
 
   return (
     <View style={styles.page}>
       <View style={styles.container}>
         <View style={styles.topCover}>
           <View style={styles.heading}>
-            <TouchableOpacity onPress={() => navigation.goBack()}>
+            <TouchableOpacity onPress={() => navigation.navigate("profile")}>
               <Image
                 source={require('../../assets/baack.png')}
                 style={styles.heartImg}
@@ -182,7 +167,7 @@ const onViewCallBack = React.useCallback((viewableItems)=> {
               />
             </TouchableOpacity>
           </View>
-          <View style={{marginTop: 30}}>
+          {/* <View style={{marginTop: 30}}>
             <TextField
               placeholder="Search..."
               CustomeIcon={() => (
@@ -201,12 +186,12 @@ const onViewCallBack = React.useCallback((viewableItems)=> {
               mainContainerStyle={{backgroundColor: 'white'}}
               placeholderTextColor={'#ced7d5'}
             />
-          </View>
+          </View> */}
         </View>
         <MapboxGl.MapView
-        onPress={(item) =>{
-          console.log("Map pressed: ", item)
-        }}
+          onPress={item => {
+            console.log('Map pressed: ', item);
+          }}
           style={styles.map}
           styleURL={MapboxGl.StyleURL.Light}
           zoomEnabled>
@@ -229,14 +214,19 @@ const onViewCallBack = React.useCallback((viewableItems)=> {
                     // scrollToIndex(i)
                   }}>
                   <ImageBackground
+                  resizeMode='contain'
                     source={
-                      selectedItem?.id == marker?.id
-                        ? require(`../../assets/mark4.png`)
-                        : require(`../../assets/mark3.png`)
+                      marker?.rating == 1
+                        ? require(`../../assets/mark1.png`)
+                        : marker?.rating == 2 ? require(`../../assets/mark2.png`)
+                        : marker?.rating == 3 ? require(`../../assets/mark3.png`)
+                        : require(`../../assets/mark4.png`)
                     }
-                    style={styles.heartImg1}
-                  >
-                    <Text style={{fontSize: 12, color: "white", paddingLeft: 8, paddingTop: Platform.OS == "ios" ? 6 : 5}}>{marker.rating?.toFixed(0)}</Text>
+                    style={[
+                      selectedItem?.id == marker?.id
+                        ? styles.selectedImg
+                        : styles.heartImg1,
+                    ]}>
                   </ImageBackground>
                 </Pressable>
               </MapboxGl.MarkerView>
@@ -244,90 +234,6 @@ const onViewCallBack = React.useCallback((viewableItems)=> {
           })}
         </MapboxGl.MapView>
 
-        {/* <View
-          style={{
-            // position: 'absolute',
-            zIndex: 100,
-            bottom: heightPercentage(8),
-            width: '1000%',
-            paddingHorizontal: 15,
-            alignSelf: 'center',
-            paddingVertical: 15,
-            marginHorizontal: 15,
-            backgroundColor: 'white',
-            borderRadius: 15,
-            // marginBottom: 20,
-          }}> */}
-        {/* <View
-            style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-            }}>
-            <View
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                width: '60%',
-              }}>
-              <View style={styles.samImg}>
-                <Image
-                  source={require('../../assets/sample.png')}
-                  style={styles.subImg}
-                />
-              </View>
-              <View>
-                <Text
-                  style={{paddingLeft: 10, letterSpacing: 0.6, color: 'black'}}>
-                  {selectedHotel?.name
-                    ? selectedHotel?.name
-                    : 'Delta Plaza Hotel'}
-                </Text>
-                <Text
-                  style={{fontSize: 12, paddingLeft: 10, letterSpacing: 0.6}}>
-                  {selectedHotel?.location
-                    ? selectedHotel?.location
-                    : 'Located in New Tower'}
-                </Text>
-                <Text
-                  style={{
-                    color: '#439281',
-                    fontSize: 18,
-                    letterSpacing: 1,
-                    paddingLeft: 10,
-                    paddingTop: 5,
-                  }}>
-                  {selectedHotel?.rate ? selectedHotel?.rate : '$250'}
-                  <Text
-                    style={{
-                      color: '#ced7d5',
-                      fontWeight: '400',
-                      fontSize: 14,
-                    }}>
-                    /night
-                  </Text>
-                </Text>
-              </View>
-            </View>
-            <View
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                alignSelf: 'flex-start',
-              }}>
-              <Text style={{fontSize: 12, color: '#ced7d5', paddingRight: 3}}>
-                {selectedHotel?.rating
-                  ? selectedHotel?.rating.toFixed(1)
-                  : '4.7'}
-              </Text>
-              <View style={styles.itemImg}>
-                <Image
-                  source={require('../../assets/star.png')}
-                  style={styles.subImg}
-                />
-              </View>
-            </View>
-          </View> */}
         <View
           style={{
             position: 'absolute',
@@ -346,8 +252,8 @@ const onViewCallBack = React.useCallback((viewableItems)=> {
             layout={'default'}
             // ref={ref => (this.carousel = ref)}
             data={markers}
-            style={{width: "100%"}}
-            ref={(ref) => flatRef.current = ref}
+            style={{width: '100%'}}
+            ref={ref => (flatRef.current = ref)}
             sliderWidth={widthPercentage(100)}
             viewabilityConfig={_viewabilityConfig}
             onViewableItemsChanged={onViewCallBack}
@@ -358,74 +264,85 @@ const onViewCallBack = React.useCallback((viewableItems)=> {
 
             // }}
             renderItem={({item, index}) => {
-              return <View
-            style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              backgroundColor: "white",
-              paddingHorizontal: 12, paddingVertical: 18,
-              borderRadius: 15
-            }}>
-            <View
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                width: '60%',
-              }}>
-              <View style={styles.samImg}>
-                <Image
-                  source={require('../../assets/sample.png')}
-                  style={styles.subImg}
-                />
-              </View>
-              <View>
-                <Text
-                  style={{paddingLeft: 10, letterSpacing: 0.6, color: 'black'}}>
-                  {item?.name}
-                </Text>
-                <Text
-                  style={{fontSize: 12, paddingLeft: 10, letterSpacing: 0.6}}>
-                  {item?.location}
-                </Text>
-                <Text
+              return (
+                <View
                   style={{
-                    color: '#439281',
-                    fontSize: 18,
-                    letterSpacing: 1,
-                    paddingLeft: 10,
-                    paddingTop: 5,
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    backgroundColor: 'white',
+                    paddingHorizontal: 12,
+                    paddingVertical: 18,
+                    borderRadius: 15,
                   }}>
-                  ${item?.rate}
-                  <Text
+                  <View
                     style={{
-                      color: '#ced7d5',
-                      fontWeight: '400',
-                      fontSize: 14,
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      width: '60%',
                     }}>
-                    /night
-                  </Text>
-                </Text>
-              </View>
-            </View>
-            <View
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                alignSelf: 'flex-start',
-              }}>
-              <Text style={{fontSize: 12, color: '#ced7d5', paddingRight: 3}}>
-                {item?.rating?.toFixed(1)}
-              </Text>
-              <View style={styles.itemImg}>
-                <Image
-                  source={require('../../assets/star.png')}
-                  style={styles.subImg}
-                />
-              </View>
-            </View>
-          </View> 
-            
+                    <View style={styles.samImg}>
+                      <Image
+                        source={{uri: item?.image}}
+                        style={styles.subImg}
+                      />
+                    </View>
+                    <View>
+                      <Text
+                        style={{
+                          paddingLeft: 10,
+                          letterSpacing: 0.6,
+                          color: 'black',
+                        }}>
+                        {item?.name}
+                      </Text>
+                      <Text
+                        style={{
+                          fontSize: 12,
+                          paddingLeft: 10,
+                          letterSpacing: 0.6,
+                        }}>
+                        {item?.location}
+                      </Text>
+                      <Text
+                        style={{
+                          color: '#439281',
+                          fontSize: 18,
+                          letterSpacing: 1,
+                          paddingLeft: 10,
+                          paddingTop: 5,
+                        }}>
+                        ${item?.rate}
+                        <Text
+                          style={{
+                            color: '#ced7d5',
+                            fontWeight: '400',
+                            fontSize: 14,
+                          }}>
+                          /night
+                        </Text>
+                      </Text>
+                    </View>
+                  </View>
+                  <View
+                    style={{
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      alignSelf: 'flex-start',
+                    }}>
+                    <Text
+                      style={{fontSize: 12, color: '#ced7d5', paddingRight: 3}}>
+                      {item?.rating?.toFixed(1)}
+                    </Text>
+                    <View style={styles.itemImg}>
+                      <Image
+                        source={require('../../assets/star.png')}
+                        style={styles.subImg}
+                      />
+                    </View>
+                  </View>
+                </View>
+              );
             }}
             onSnapToItem={index => console.log('snapped')}
           />
@@ -481,10 +398,16 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
   },
   heartImg1: {
-    height: Platform.OS == "ios" ? heightPercentage(7) : heightPercentage(8),
-    width: Platform.OS == "ios" ? widthPercentage(12) : widthPercentage(12),
+    height: Platform.OS == 'ios' ? heightPercentage(7) : heightPercentage(7),
+    width: Platform.OS == 'ios' ? widthPercentage(12) : widthPercentage(10),
     alignSelf: 'center',
-    alignItems: "center",
+    alignItems: 'center',
+  },
+  selectedImg: {
+    height: Platform.OS == 'ios' ? heightPercentage(7) : heightPercentage(9.1),
+    width: Platform.OS == 'ios' ? widthPercentage(12) : widthPercentage(14),
+    alignSelf: 'center',
+    alignItems: 'center',
   },
   samImg: {
     height: Platform.isPad ? heightPercentage(4) : heightPercentage(10),
@@ -501,4 +424,16 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     overflow: 'hidden',
   },
+  ratingTxt: {
+    fontSize: 10,
+    color: 'white',
+    paddingLeft: 8,
+    paddingTop: Platform.OS == 'ios' ? 8 : 6,
+  },
+  selectdTxt:{
+    fontSize: 11,
+    color: 'white',
+    paddingLeft: 8,
+    paddingTop: Platform.OS == 'ios' ? 8 : 9,
+  }
 });

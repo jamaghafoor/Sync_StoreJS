@@ -79,13 +79,13 @@ const Details = ({navigation}) => {
                 </View>
                
                   <Text
-                    style={{fontSize: 13, paddingLeft: 10, letterSpacing: 0.6}}>
+                    style={{fontSize: 13, paddingLeft: 10, letterSpacing: 0.6, color: "#6f7574"}}>
                    {item?.desc}
                   </Text>
             
               </View>
               <View style={{alignItems: 'center', alignSelf: 'flex-start'}}>
-                <Text>$165</Text>
+                <Text style={{color: "#7b7d82"}}>$165</Text>
                 <View style={styles.itemImg}>
                   {index == 1 ? (
                     <Image
