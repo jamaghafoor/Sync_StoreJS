@@ -26,7 +26,7 @@ const Search = ({navigation, route}) => {
   const [selectedguest, setseSectedGuest] = useState('');
   const [HotelsData, setHotelsData] = useState([]);
   const [likeState, setLikeState] = useState(false);
-
+  const [message, setMessage] = useState('');
 
   // console.log("HotelsData: ", HotelsData);
 
@@ -69,7 +69,7 @@ const Search = ({navigation, route}) => {
     },
   ]);
 
-  console.log('HotelsData: ', HotelsData);
+  // console.log('HotelsData: ', HotelsData);
 
   useEffect(() => {
     (async () => {
@@ -77,49 +77,135 @@ const Search = ({navigation, route}) => {
       let get_all_filters = await AsyncStorage.getItem('filters');
       get_all_filters = JSON.parse(get_all_filters);
       let allHotelsArr = JSON.parse(allHotelsData);
-      let newData = await allHotelsArr.filter(item => {
-        return (
-          item.rate >= get_all_filters?.range &&
-          item.rating >= get_all_filters?.rating &&
-          item.bedrooms >= get_all_filters?.bedrooms &&
-          item.distance <= get_all_filters?.sliderValue
-        );
-      });
+      if (get_all_filters) {
+        let newData = allHotelsArr;
+        let ratingData1 = [];
+        let ratingData2 = [];
+        let ratingData3 = [];
+        let ratingData4 = [];
+        let {
+          studio,
+          range,
+          range1,
+          range2,
+          range3,
+          range4,
+          rating1,
+          rating2,
+          rating3,
+          rating4,
+          bedrooms,
+          bedrooms2,
+          bedrooms3,
+          bedrooms4,
+          sliderValue,
+        } = get_all_filters
+        ;
+        console.log("newData: ", newData.length)
+        if (rating1) {
+          ratingData1 = await newData.filter(item => item?.rating == 1);
+        }
+        if (rating2) {
+          ratingData2 = await newData.filter(item => item?.rating == 2);
+        }
+        if (rating3) {
+          ratingData3 = await newData.filter(item => item?.rating == 3);
+        }
+        if (rating4) {
+          ratingData4 = await newData.filter(item => item?.rating >= 4);
+        }
+        let allRatingFiltersData = [
+          ...ratingData1,
+          ...ratingData2,
+          ...ratingData3,
+          ...ratingData4,
+        ];
+        console.log("allRatingFiltersData: ", allRatingFiltersData.length)
 
-      setHotelsData(newData);
+
+        let bedRoomsData = [];
+        let bedRoomsData2 = [];
+        let bedRoomsData3 = [];
+        let bedRoomsData4 = [];
+
+        if (bedrooms) {
+          bedRoomsData = await allRatingFiltersData.filter(item => 1 == item?.bedrooms);
+        }
+        if (bedrooms2) {
+          bedRoomsData2 = await allRatingFiltersData.filter(item => 2 == item?.bedrooms);
+        }
+        if (bedrooms3) {
+          bedRoomsData3 = await allRatingFiltersData.filter(item => 3 == item?.bedrooms);
+        }
+        if (bedrooms4) {
+          bedRoomsData4 = await allRatingFiltersData.filter(item => item?.bedrooms >= 4);
+        }
+        let allBedroomsData = [...bedRoomsData, ...bedRoomsData2, ...bedRoomsData3, ...bedRoomsData4]
+        console.log("allBedroomsData: ", allBedroomsData)
+
+        
+        let rangeData = [];
+        let rangeData1 = [];
+        let rangeData2 = [];
+        let rangeData3 = [];
+        let rangeData4 = [];
+
+        if (range) {
+          rangeData = await allBedroomsData.filter(item => item?.rate > 1 && item?.rate < 101);
+        }
+        if (range1) {
+          rangeData1 = await allBedroomsData.filter(item => item?.rate > 100 && item?.rate < 201);
+        }
+        if (range2) {
+          rangeData2 = await allBedroomsData.filter(item => item?.rate > 200 && item?.rate < 301);
+        }
+        if (range3) {
+          rangeData3 = await allBedroomsData.filter(item =>  item?.rate > 300 && item?.rate < 401);
+        }
+        if (range4) {
+          rangeData4 = await allBedroomsData.filter(item =>  item?.rate > 400);
+        }
+
+        let allRangeFilteredData = [...rangeData, ...rangeData1, ...rangeData2, ...rangeData3, ...rangeData4]
+        console.log("allRangeFilteredData: ", rangeData.length, rangeData1.length, rangeData2?.length, rangeData3?.length, rangeData4?.length)
+
+        setHotelsData(allRangeFilteredData);
+        setMessage(
+          allRangeFilteredData?.length == 0
+            ? 'No data found gainst the selected filters.'
+            : '',
+        );
+      } else {
+        setHotelsData(allHotelsArr);
+      }
     })();
   }, [navigation, isFocused, likeState]);
 
-
-
   const likeUnlikeHandle = async (id, type) => {
-    
     let allHotelsData = await AsyncStorage.getItem('HotelsData');
-    let allArr =  JSON.parse(allHotelsData)
+    let allArr = JSON.parse(allHotelsData);
 
     if (type == 'unlike') {
       allArr?.forEach(item => {
         if (item?.id == id) {
-          item["like"] = false;
+          item['like'] = false;
         }
       });
-    } else{
+    } else {
       allArr?.forEach(item => {
         if (item?.id == id) {
-          item["like"] = true;
+          item['like'] = true;
         }
       });
     }
     await AsyncStorage.setItem('HotelsData', JSON.stringify(allArr));
-    setLikeState(!likeState)
-
-    
+    setLikeState(!likeState);
   };
 
   return (
     <View style={{flex: 1}}>
       <View style={styles.heading}>
-        <TouchableOpacity onPress={() => {}}>
+        <TouchableOpacity onPress={() => navigation.goBack()}>
           <Image
             source={require('../../assets/baack.png')}
             style={styles.heartImg}
@@ -219,21 +305,33 @@ const Search = ({navigation, route}) => {
               }}>
               <Image
                 source={require('../../assets/done.png')}
-                style={{width: '100%', height: '100%', borderRadius: 30,}}
+                style={{width: '100%', height: '100%', borderRadius: 30}}
               />
             </TouchableOpacity>
           </View>
         </View>
+        {message.length > 0 && (
+          <Text
+            style={{
+              fontWeight: 'bold',
+              color: 'gray',
+              alignSelf: 'center',
+              marginTop: heightPercentage(10),
+            }}>
+            {message}
+          </Text>
+        )}
         <View style={{flex: 1, height: '100%', marginTop: 30}}>
           <FlatList
             data={HotelsData}
             style={{flex: 1}}
-            keyExtractor={item => item?.id}
+            keyExtractor={item => item?.id + 1}
             showsVerticalScrollIndicator={false}
             renderItem={({item}, index) => {
               return (
                 <Pressable
-                  onPress={() => navigation.navigate('ProductDetails',{item})}
+                  key={item?.id}
+                  onPress={() => navigation.navigate('ProductDetails', {item})}
                   style={{
                     flex: 1,
                     alignSelf: 'center',
@@ -260,12 +358,10 @@ const Search = ({navigation, route}) => {
                       },
                     ]}
                     resizeMode="cover"
-                    source={require('../../assets/pro.png')}>
+                    source={{uri: item?.image}}>
                     {item?.like ? (
                       <TouchableOpacity
-                        onPress={() =>
-                          likeUnlikeHandle(item?.id, 'unlike')
-                        }>
+                        onPress={() => likeUnlikeHandle(item?.id, 'unlike')}>
                         <Image
                           source={require('../../assets/like.png')}
                           resizeMode="contain"
@@ -290,13 +386,14 @@ const Search = ({navigation, route}) => {
                       justifyContent: 'space-between',
                       width: '100%',
                       paddingHorizontal: 15,
+                      paddingTop: 5,
                     }}>
                     <View style={{flexDirection: 'row', alignItems: 'center'}}>
                       <Rating
                         rating={item?.rating}
                         total={5}
-                        size={13}
-                        color={'yellow'}
+                        size={15}
+                        color={'#e67f44'}
                       />
                       <Text
                         style={{
@@ -304,10 +401,10 @@ const Search = ({navigation, route}) => {
                           paddingLeft: 7,
                           color: '#ced7d5',
                         }}>
-                        {item?.rating}
+                        {item?.rating?.toFixed(1)}
                       </Text>
                     </View>
-                    <Text style={{fontSize: 12}}>244 Reviews</Text>
+                    <Text style={{fontSize: 12}}>{item?.reviews} Reviews</Text>
                   </View>
                   <Text
                     style={{
@@ -436,7 +533,7 @@ const stateStyles = StyleSheet.create({
     fontSize: isIpad ? 10 : 12.5,
     color: 'gray',
   },
-  itemText:{
+  itemText: {
     fontSize: isIpad ? 20 : 14,
     color: '#9f9f9f',
   },

@@ -12,10 +12,13 @@ import {heightPercentage, widthPercentage} from '../utils';
 import DummyData from '../utils/Data.json';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useIsFocused} from '@react-navigation/native';
+import { firebase } from '@react-native-firebase/database';
+
 
 const Favourite = ({navigation}) => {
   const [favHotelsData, setFavHotelsData] = useState([]);
   const [likeState, setLikeState] = useState(false);
+  const [allHotelsData, setAllHotelsData] = useState([]);
 
   const isFocused = useIsFocused();
 
@@ -23,21 +26,23 @@ const Favourite = ({navigation}) => {
     (async () => {
       let hotelsData = await AsyncStorage.getItem('HotelsData');
       let allHotesArr = JSON.parse(hotelsData);
+      setAllHotelsData(allHotesArr)
       let newData = await allHotesArr.filter(item => {
         return item?.like;
       });
       setFavHotelsData(newData);
+      
     })();
   }, [navigation, isFocused, likeState]);
 
   const handleFav = async id => {
-    let favAll = favHotelsData;
-    favAll?.forEach(item => {
+      let AllHotelsData = allHotelsData;
+      AllHotelsData?.forEach(item => {
       if (item?.id == id) {
         item['like'] = false;
       }
     });
-    await AsyncStorage.setItem('HotelsData', JSON.stringify(favAll));
+    await AsyncStorage.setItem('HotelsData', JSON.stringify(AllHotelsData));
     setLikeState(!likeState);
   };
 
@@ -99,12 +104,13 @@ const Favourite = ({navigation}) => {
                       paddingLeft: 10,
                       letterSpacing: 0.6,
                       paddingRight: 5,
+                      color: "#6f7574"
                     }}>
                     {item?.descreption?.slice(0, 100)}
                   </Text>
                 </View>
                 <View style={{alignItems: 'center', alignSelf: 'flex-start'}}>
-                  <Text>{item?.rate}</Text>
+                  <Text style={{color: "#7b7d82"}}>${item?.rate}</Text>
                   <View style={styles.itemImg}>
                     {item?.rating.toFixed(0) == 1 ? (
                       <Image
@@ -190,7 +196,7 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   likeImg: {
-    height: Platform.isPad ? heightPercentage(4) : heightPercentage(2.4),
+    height: Platform.isPad ? heightPercentage(4) : heightPercentage(2.6),
     width: Platform.isPad ? widthPercentage(6) : widthPercentage(6),
     alignSelf: 'center',
     marginTop: 10,
